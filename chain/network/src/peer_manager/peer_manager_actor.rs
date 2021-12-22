@@ -1529,8 +1529,7 @@ impl Actor for PeerManagerActor {
                         if let Ok((conn, client_addr)) = listener.accept().await {
                             (conn, client_addr)
                         } else {
-                            info!(target: "network", "Stopping listening");
-                            return;
+                            error!(target: "network", "Failed to accept connection");
                         };
                     address.do_send(PeerManagerMessageRequest::InboundTcpConnect(
                         InboundTcpConnect::new(conn),
