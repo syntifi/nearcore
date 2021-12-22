@@ -1515,11 +1515,15 @@ impl Actor for PeerManagerActor {
             let address = ctx.address();
 
             async move {
-                let listener = TcpListener::bind(server_addr).await.ok();
-                let listener = if let Some(listener) = listener {
-                    listener
-                } else {
-                    panic!("failed to start listening on server_addr={:?}", server_addr);
+                let listener = TcpListener::bind(server_addr).await;
+                let listener = match listener {
+                    Ok(listener) => listener,
+                    Err(e) => {
+                        panic!(
+                            "failed to start listening on server_addr={:?} e={:?}",
+                            server_addr, e
+                        );
+                    }
                 };
 
                 loop {
