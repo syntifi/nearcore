@@ -1510,7 +1510,7 @@ impl Actor for PeerManagerActor {
         // Start server if address provided.
         if let Some(server_addr) = self.config.addr {
             debug!(target: "network", at = ?server_addr, "starting public server");
-            let address = ctx.address();
+            let peer_manager_addr = ctx.address();
 
             async move {
                 let listener = TcpListener::bind(server_addr).await;
@@ -1526,7 +1526,7 @@ impl Actor for PeerManagerActor {
 
                 loop {
                     if let Ok((conn, client_addr)) = listener.accept().await {
-                        address.do_send(PeerManagerMessageRequest::InboundTcpConnect(
+                        peer_manager_addr.do_send(PeerManagerMessageRequest::InboundTcpConnect(
                             InboundTcpConnect::new(conn),
                         ));
                         debug!(target: "network", from = ?client_addr, "got new connection");
