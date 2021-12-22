@@ -1509,8 +1509,6 @@ impl Actor for PeerManagerActor {
     fn started(&mut self, ctx: &mut Self::Context) {
         // Start server if address provided.
         if let Some(server_addr) = self.config.addr {
-            // TODO: for now crashes if server didn't start.
-
             debug!(target: "network", message = "starting server", at = ?server_addr);
             let address = ctx.address();
 
@@ -1531,6 +1529,7 @@ impl Actor for PeerManagerActor {
                         if let Ok((conn, client_addr)) = listener.accept().await {
                             (conn, client_addr)
                         } else {
+                            info!(target: "network", "Stopping listening");
                             return;
                         };
                     address.do_send(PeerManagerMessageRequest::InboundTcpConnect(
