@@ -1509,7 +1509,7 @@ impl Actor for PeerManagerActor {
     fn started(&mut self, ctx: &mut Self::Context) {
         // Start server if address provided.
         if let Some(server_addr) = self.config.addr {
-            debug!(target: "network", message = "starting server", at = ?server_addr);
+            debug!(target: "network", at = ?server_addr, "starting public server");
             let address = ctx.address();
 
             async move {
@@ -1525,16 +1525,12 @@ impl Actor for PeerManagerActor {
                 };
 
                 loop {
-                    let (conn, client_addr) =
-                        if let Ok((conn, client_addr)) = listener.accept().await {
-                            (conn, client_addr)
-                        } else {
-                            error!(target: "network", "Failed to accept connection");
-                        };
-                    address.do_send(PeerManagerMessageRequest::InboundTcpConnect(
-                        InboundTcpConnect::new(conn),
-                    ));
-                    debug!(target: "network", message = "new connection", from = ?client_addr);
+                    if let Ok((conn, client_addr)) = listener.accept().await {
+                        address.do_send(PeerManagerMessageRequest::InboundTcpConnect(
+                            InboundTcpConnect::new(conn),
+                        ));
+                        debug!(target: "network", from = ?client_addr, "got new connection");
+                    }
                 }
             }
             .into_actor(self)
