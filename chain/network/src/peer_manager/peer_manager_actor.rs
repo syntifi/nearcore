@@ -797,7 +797,7 @@ impl PeerManagerActor {
                     .take_while(|x| match x {
                         Ok(_) => true,
                         Err(e) => {
-                            warn!(target: "network", "Peer stream error: {:?}", e);
+                            warn!(target: "network", ?e, "Peer stream error");
                             false
                         }
                     })
